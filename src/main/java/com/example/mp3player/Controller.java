@@ -119,17 +119,20 @@ public class Controller implements Initializable {
                 }
             }
         });
-        //Создание списка песен
 
+
+        //Создание списка песен
         for (File file : files) {
             songsNames.add(file.getName());
         }
 
         musicList.getItems().addAll(songsNames);
+        //Работа со списком песен
         musicList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
                 mediaPlayer.pause();
+                //Поиск выбранного трека
                 int counter = -1;
                 for (int i = 0; i < songsNames.size(); i++) {
                     if (Objects.equals(songsNames.get(i), t1)) {
@@ -137,8 +140,8 @@ public class Controller implements Initializable {
                         break;
                     }
                 }
-
-                musicList.getSelectionModel();
+                //Воспросизведение выбранного трека
+                musicList.getSelectionModel(); // Я не помню зачем это написал
                 if (timer != null) {
                     cancelTimer();
                 }
@@ -157,7 +160,6 @@ public class Controller implements Initializable {
         });
 
         //Поиск файла в списке
-
         musicSearchField.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
@@ -169,17 +171,9 @@ public class Controller implements Initializable {
                 }
             }
         });
-
-
-//        mediaPlayer.statusProperty().addListener((observable, oldStatus, newStatus) -> {
-//            if (newStatus == MediaPlayer.Status.PLAYING) {
-//                cancelTimer();
-//                beginTimer();
-//                mediaPlayer.play();
-//            }
-//        });
     }
 
+    //Функция поиска
     private static ArrayList<String> textSearch(String text) {
         ArrayList<String> res = new ArrayList<>();
 
@@ -205,13 +199,14 @@ public class Controller implements Initializable {
                 Files.copy(file.toPath(),newFile.toPath(),StandardCopyOption.REPLACE_EXISTING);
                 songsNames.add(newFile.getName());
                 musicList.getItems().add(newFile.getName());
+                songs.add(newFile);
             } catch (IOException e){
                 e.printStackTrace();
             }
         }
     }
 
-    //Drag and drop system
+    //Drag and drop
     public void handleDragOver(DragEvent event) {
         if (event.getDragboard().hasFiles()) {
             event.acceptTransferModes(TransferMode.ANY);
@@ -237,6 +232,14 @@ public class Controller implements Initializable {
                 songs.add(file);
                 songsNames.add(file.getName());
                 musicList.getItems().add(file.getName());
+
+                File saveDir = new File("music");
+                File newFile = new File(saveDir,file.getName());
+                try {
+                    Files.copy(file.toPath(),newFile.toPath(),StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException e){
+                    e.printStackTrace();
+                }
             }
 
             mediaPlayer.stop();
@@ -319,6 +322,7 @@ public class Controller implements Initializable {
 
             //mediaPlayer.play();
         }
+        playMedia();
     }
 
     public void nextMedia() {
@@ -360,6 +364,8 @@ public class Controller implements Initializable {
 
             //mediaPlayer.play();
         }
+
+        playMedia();
     }
 
     public void changeSpeed(ActionEvent event) {
